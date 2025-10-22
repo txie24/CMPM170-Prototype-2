@@ -97,28 +97,28 @@ public class PlayerMovement : MonoBehaviour
 			case 0:
 				Physics2D.gravity = new Vector2(3 * 9.8f, 0);
 				characterCollider.size = new Vector2(1.25f, .9f);
-				groundCheck.position = new Vector3(.63f, 0, 0);
+				groundCheck.localPosition = new Vector3(.63f, 0, 0);
 				sprite.rotation = Quaternion.Euler(0, 0, 90);
 				gravityDirection = 0;
 				break;
 			case 1:
 				Physics2D.gravity = new Vector2(3 * -9.8f, 0);
 				characterCollider.size = new Vector2(1.25f, .9f);
-				groundCheck.position = new Vector3(-.63f, 0, 0);
+				groundCheck.localPosition = new Vector3(-.63f, 0, 0);
 				sprite.rotation = Quaternion.Euler(0, 0, -90);
 				gravityDirection = 1;
 				break;
 			case 2:
 				Physics2D.gravity = new Vector2(0, 3 * 9.8f);
 				characterCollider.size = new Vector2(.9f, 1.25f);
-				groundCheck.position = new Vector3(0, .63f, 0);
+				groundCheck.localPosition = new Vector3(0, .63f, 0);
 				sprite.rotation = Quaternion.Euler(0, 0, 180);
 				gravityDirection = 2;
 				break;
 			case 3:
 				Physics2D.gravity = new Vector2(0, 3 * -9.8f);
 				characterCollider.size = new Vector2(.9f, 1.25f);
-				groundCheck.position = new Vector3(0, -.63f, 0);
+				groundCheck.localPosition = new Vector3(0, -.63f, 0);
 				sprite.rotation = Quaternion.Euler(0, 0, 0);
 				gravityDirection = 3;
 				break;
