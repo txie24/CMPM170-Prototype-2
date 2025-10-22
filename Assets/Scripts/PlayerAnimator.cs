@@ -40,25 +40,7 @@ public class PlayerAnimator : MonoBehaviour
 
     private void LateUpdate()
     {
-        #region Tilt
-        float tiltProgress;
-
-        int mult = -1;
-
-        if (mov.IsSliding)
-        {
-            tiltProgress = 0.25f;
-        }
-        else
-        {
-            tiltProgress = Mathf.InverseLerp(-mov.Data.runMaxSpeed, mov.Data.runMaxSpeed, mov.RB.linearVelocity.x);
-            mult = (mov.IsFacingRight) ? 1 : -1;
-        }
-            
-        float newRot = ((tiltProgress * maxTilt * 2) - maxTilt);
-        float rot = Mathf.LerpAngle(spriteRend.transform.localRotation.eulerAngles.z * mult, newRot, tiltSpeed);
-        spriteRend.transform.localRotation = Quaternion.Euler(0, 0, rot * mult);
-        #endregion
+        
 
         CheckAnimationState();
 
@@ -87,7 +69,6 @@ public class PlayerAnimator : MonoBehaviour
             justLanded = false;
             return;
         }
-
-        anim.SetFloat("Vel Y", mov.RB.linearVelocity.y);
+        
     }
 }
