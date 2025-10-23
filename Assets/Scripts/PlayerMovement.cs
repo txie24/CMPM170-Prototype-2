@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+	private PlayerAnimator playerAnimator;  
+    private bool wasGrounded;                
 	[Header("movement")] [SerializeField] float moveSpeed = 8f;
 	[SerializeField] float jumpForce = 12f;
 
@@ -26,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
 	void Awake()
 	{
 		rb = GetComponent<Rigidbody2D>();
+		playerAnimator = GetComponent<PlayerAnimator>();
 	}
 
 	void Update()
@@ -50,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
 					rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
 					break;
 			}
+			if (playerAnimator) playerAnimator.startedJumping = true;
 		}
 
 		if (Input.GetButtonUp("Jump") && rb.linearVelocity.y > 0)
@@ -81,6 +85,8 @@ public class PlayerMovement : MonoBehaviour
 		}
 
 		isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, groundLayer);
+		if (isGrounded && !wasGrounded && playerAnimator) playerAnimator.justLanded = true;
+		wasGrounded = isGrounded;
 	}
 
 	void OnDrawGizmosSelected()

@@ -1,74 +1,74 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerAnimator : MonoBehaviour
 {
-    private PlayerMovement mov;
-    private Animator anim;
-    private SpriteRenderer spriteRend;
-
-    private DemoManager demoManager;
-
-    [Header("Movement Tilt")]
-    [SerializeField] private float maxTilt;
-    [SerializeField] [Range(0, 1)] private float tiltSpeed;
-
-    [Header("Particle FX")]
+    [Header("FX Prefabs")]
     [SerializeField] private GameObject jumpFX;
     [SerializeField] private GameObject landFX;
-    private ParticleSystem _jumpParticle;
-    private ParticleSystem _landParticle;
 
-    public bool startedJumping {  private get; set; }
-    public bool justLanded { private get; set; }
+    [Header("Animator")]
+    [SerializeField] private Animator anim;
 
-    public float currentVelY;
+    [HideInInspector] public bool startedJumping;
+    [HideInInspector] public bool justLanded;
 
-    private void Start()
+    private SpriteRenderer spriteRend;
+
+    void Awake()
     {
-        mov = GetComponent<PlayerMovement>();
+        if (anim == null) anim = GetComponentInChildren<Animator>();
         spriteRend = GetComponentInChildren<SpriteRenderer>();
-        anim = spriteRend.GetComponent<Animator>();
-
-        // updated to avoid CS0618
-        demoManager = FindFirstObjectByType<DemoManager>();
-
-        _jumpParticle = jumpFX.GetComponent<ParticleSystem>();
-        _landParticle = landFX.GetComponent<ParticleSystem>();
     }
 
-    private void LateUpdate()
-    {
-        
-
-        CheckAnimationState();
-
-        ParticleSystem.MainModule jumpPSettings = _jumpParticle.main;
-        jumpPSettings.startColor = new ParticleSystem.MinMaxGradient(demoManager.SceneData.foregroundColor);
-        ParticleSystem.MainModule landPSettings = _landParticle.main;
-        landPSettings.startColor = new ParticleSystem.MinMaxGradient(demoManager.SceneData.foregroundColor);
-    }
-
-    private void CheckAnimationState()
+    void Update()
     {
         if (startedJumping)
         {
-            anim.SetTrigger("Jump");
-            GameObject obj = Instantiate(jumpFX, transform.position - (Vector3.up * transform.localScale.y / 2), Quaternion.Euler(-90, 0, 0));
-            Destroy(obj, 1);
+            if (anim) anim.SetTrigger("Jump");
+            SpawnFX(jumpFX);
             startedJumping = false;
             return;
         }
 
         if (justLanded)
         {
-            anim.SetTrigger("Land");
-            GameObject obj = Instantiate(landFX, transform.position - (Vector3.up * transform.localScale.y / 1.5f), Quaternion.Euler(-90, 0, 0));
-            Destroy(obj, 1);
+            if (anim) anim.SetTrigger("Land");
+            SpawnFX(landFX);
             justLanded = false;
             return;
         }
-        
+    }
+
+    private void SpawnFX(GameObject prefab, float lifetime = 1f, float padding = 0.02f)
+    {
+        if (prefab == null || spriteRend == null) return;
+
+        Vector3 pos = BottomOfSprite(padding);
+        Quaternion rot = ParticleRotationAgainstGravity();
+
+        GameObject fx = Instantiate(prefab, pos, rot);
+        Destroy(fx, lifetime);
+    }
+
+    private Vector3 BottomOfSprite(float padding = 0.02f)
+    {
+        Vector2 g = Physics2D.gravity;
+        Vector2 down = g.sqrMagnitude > 0f ? g.normalized : Vector2.down;
+
+        var b = spriteRend.bounds;
+        var ext = b.extents;
+
+        float halfAlongDown = Mathf.Abs(down.x) * ext.x + Mathf.Abs(down.y) * ext.y;
+
+        return b.center + (Vector3)down * (halfAlongDown + padding);
+    }
+
+    private Quaternion ParticleRotationAgainstGravity()
+    {
+        Vector2 g = Physics2D.gravity;
+        if (g.sqrMagnitude <= 0f) return Quaternion.identity;
+
+        Vector3 againstGravity = -(Vector3)g.normalized;
+        return Quaternion.FromToRotation(Vector3.up, againstGravity);
     }
 }

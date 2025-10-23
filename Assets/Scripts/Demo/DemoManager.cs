@@ -3,28 +3,21 @@ using UnityEngine.Tilemaps;
 
 public class DemoManager : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] private Camera cam;                 // optional: assign in inspector
-    [SerializeField] private Transform player;           // we only need the Transform
-    [SerializeField] private Transform spawnPoint;
-    [SerializeField] private Tilemap[] levels;
+    private Camera _cam;
+    private PlayerMovement _player;
 
-    [Header("State")]
-    private int currentTilemapIndex = 0;
-    private Color currentForegroundColor = Color.white;
+    [SerializeField] private Tilemap[] levels;
+    [SerializeField] private Transform spawnPoint;
+
+    private int _currentTilemapIndex;
+    private Color _currentForegroundColor;
 
     public SceneData SceneData;
 
     private void Awake()
     {
-        if (!cam) cam = FindFirstObjectByType<Camera>();
-
-        if (!player)
-        {
-            var p = GameObject.FindWithTag("Player");
-            if (p) player = p.transform;
-            else Debug.LogWarning("DemoManager: No object with tag 'Player' found.");
-        }
+        _cam = FindFirstObjectByType<Camera>();
+        _player = GameObject.FindWithTag("Player").GetComponent<PlayerMovement>();
     }
 
     private void Start()
@@ -37,57 +30,31 @@ public class DemoManager : MonoBehaviour
     {
         SceneData = data;
 
-        if (cam)
-        {
-            cam.orthographicSize = data.camSize;
-            cam.backgroundColor = data.backgroundColor;
-        }
+        _cam.orthographicSize = data.camSize;
+        _cam.backgroundColor = data.backgroundColor;
+        levels[_currentTilemapIndex].color = data.foregroundColor;
 
-        if (levels != null && levels.Length > 0 && levels[currentTilemapIndex])
-        {
-            levels[currentTilemapIndex].color = data.foregroundColor;
-        }
-
-        currentForegroundColor = data.foregroundColor;
+        _currentForegroundColor = data.foregroundColor;
     }
+
 
     public void SwitchLevel(int index)
     {
-        if (levels == null || levels.Length == 0)
-        {
-            Debug.LogWarning("DemoManager: No levels assigned.");
-            return;
-        }
+        levels[_currentTilemapIndex].gameObject.SetActive(false);
+        levels[index].gameObject.SetActive(true);
+        levels[index].color = _currentForegroundColor;
 
-        if (index < 0 || index >= levels.Length)
-        {
-            Debug.LogWarning($"DemoManager: Level index {index} out of range.");
-            return;
-        }
+        _player.transform.position = spawnPoint.position;
 
-        if (levels[currentTilemapIndex])
-            levels[currentTilemapIndex].gameObject.SetActive(false);
-
-        if (levels[index])
-        {
-            levels[index].gameObject.SetActive(true);
-            levels[index].color = currentForegroundColor;
-        }
-
-        if (player && spawnPoint)
-            player.position = spawnPoint.position;
-        else
-            Debug.LogWarning("DemoManager: Missing player or spawnPoint reference.");
-
-        currentTilemapIndex = index;
+        _currentTilemapIndex = index;
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            int next = (currentTilemapIndex == levels.Length - 1) ? 0 : currentTilemapIndex + 1;
-            SwitchLevel(next);
+            SwitchLevel((_currentTilemapIndex == levels.Length - 1) ? 0 : _currentTilemapIndex + 1);
         }
+
     }
 }
