@@ -54,6 +54,7 @@ public class PlayerMovement : MonoBehaviour
 					break;
 			}
 			if (playerAnimator) playerAnimator.startedJumping = true;
+			AudioManager.instance.PlayJumpSound();
 		}
 
 		if (Input.GetButtonUp("Jump") && rb.linearVelocity.y > 0)
@@ -98,6 +99,7 @@ public class PlayerMovement : MonoBehaviour
 
 	public void ChangeGravityDirection(int direction)
 	{
+		AudioManager.instance.PlayGravityChangeSound();
 		switch (direction)
 		{
 			case 0:
