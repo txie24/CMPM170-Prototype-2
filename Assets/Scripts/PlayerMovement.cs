@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -29,6 +31,7 @@ public class PlayerMovement : MonoBehaviour
 	{
 		rb = GetComponent<Rigidbody2D>();
 		playerAnimator = GetComponent<PlayerAnimator>();
+		
 	}
 
 	void Update()
@@ -103,6 +106,7 @@ public class PlayerMovement : MonoBehaviour
 		switch (direction)
 		{
 			case 0:
+				Debug.Log("Gravity Changing to Right");
 				Physics2D.gravity = new Vector2(3 * 9.8f, 0);
 				characterCollider.size = new Vector2(1.25f, .9f);
 				groundCheck.localPosition = new Vector3(.63f, 0, 0);
@@ -110,6 +114,7 @@ public class PlayerMovement : MonoBehaviour
 				gravityDirection = 0;
 				break;
 			case 1:
+				Debug.Log("Gravity Changing to Left");
 				Physics2D.gravity = new Vector2(3 * -9.8f, 0);
 				characterCollider.size = new Vector2(1.25f, .9f);
 				groundCheck.localPosition = new Vector3(-.63f, 0, 0);
@@ -117,6 +122,7 @@ public class PlayerMovement : MonoBehaviour
 				gravityDirection = 1;
 				break;
 			case 2:
+				Debug.Log("Gravity Changing to Up");
 				Physics2D.gravity = new Vector2(0, 3 * 9.8f);
 				characterCollider.size = new Vector2(.9f, 1.25f);
 				groundCheck.localPosition = new Vector3(0, .63f, 0);
@@ -124,6 +130,7 @@ public class PlayerMovement : MonoBehaviour
 				gravityDirection = 2;
 				break;
 			case 3:
+				Debug.Log("Gravity Changing to Down");
 				Physics2D.gravity = new Vector2(0, 3 * -9.8f);
 				characterCollider.size = new Vector2(.9f, 1.25f);
 				groundCheck.localPosition = new Vector3(0, -.63f, 0);
@@ -131,6 +138,29 @@ public class PlayerMovement : MonoBehaviour
 				gravityDirection = 3;
 				break;
 
+		}
+	}
+
+	public void RandomGravitySwitch(bool swap)
+	{
+		if (swap)
+		{
+			StartCoroutine(RandomGravityCR());
+		}
+		else
+		{
+			Debug.Log("Random Gravity End Early");
+			StopCoroutine("RandomGravityCR");
+		} 
+			
+	}
+
+	IEnumerator RandomGravityCR()
+	{
+		while (true)
+		{
+			yield return new WaitForSeconds(3f);
+			ChangeGravityDirection(Random.Range(0, 4));
 		}
 	}
 }

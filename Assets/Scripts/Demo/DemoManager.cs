@@ -8,8 +8,9 @@ public class DemoManager : MonoBehaviour
 
     [SerializeField] private Tilemap[] levels;
     [SerializeField] private Transform spawnPoint;
+    [SerializeField] private GameObject playerRef;
 
-    private int _currentTilemapIndex;
+private int _currentTilemapIndex;
     private Color _currentForegroundColor;
 
     public SceneData SceneData;
@@ -54,7 +55,12 @@ public class DemoManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             SwitchLevel((_currentTilemapIndex == levels.Length - 1) ? 0 : _currentTilemapIndex + 1);
+            
+            // CODE FOR RANDOM GRAVITY EVERY X SECONDS
+            playerRef.GetComponent<PlayerMovement>().RandomGravitySwitch(_currentTilemapIndex != 0);
+            
+            // CODE FOR RANDOM GRAVITY ON TRIGGER
+            // playerRef.GetComponent<PlayerMovement>().randomGravity == true;
         }
-
     }
 }
